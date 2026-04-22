@@ -1,1 +1,0 @@
-cd /d "C:\Users\grigo\OneDrive\Рабочий стол\бот для тусовки" && py -m pip install -r requirements.txt && py bot.py
