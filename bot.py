@@ -50,8 +50,7 @@ BANK_BUTTONS: List[Tuple[str, str]] = [
 STATE_FILE = Path("state.json")
 MAIN_MENU_IMAGE_PATH = Path("imag/logo.jpg")
 BAR_MENU_IMAGE_CANDIDATES = [
-    Path("imag/menu.jpg"),
-    Path(r"C:\Users\grigo\.cursor\projects\c-Users-grigo-OneDrive\assets\c__Users_grigo_OneDrive______________________________imag_menu.jpg"),
+    Path("imag/menu.jpg")
 ]
 
 ADDRESS_TEXT = (
