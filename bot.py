@@ -50,7 +50,8 @@ BANK_BUTTONS: List[Tuple[str, str]] = [
 STATE_FILE = Path("state.json")
 MAIN_MENU_IMAGE_PATH = Path("imag/logo.jpg")
 BAR_MENU_IMAGE_CANDIDATES = [
-    Path("imag/menu.jpg")
+    Path("imag/menu.jpg"),
+    Path(r"C:\Users\grigo\.cursor\projects\c-Users-grigo-OneDrive\assets\c__Users_grigo_OneDrive______________________________imag_menu.jpg"),
 ]
 
 ADDRESS_TEXT = (
@@ -65,7 +66,7 @@ DRINKS = {
 COCKTAILS = {
     "long_island": "Лонг-Айленд - 460р.",
     "mojito": "Мохито - 460р.",
-    "rum_cola": "Рома c колой - 420р.",
+    "rum_cola": "Рома с колой - 420р.",
     "tequila_sunrise": "Текила Санрайз - 350р.",
     "vodka_energy": "Водка с энергетиком - 350р.",
 }
@@ -86,6 +87,7 @@ class Order:
     total_amount: int
     admin_id: int
     barmen_id: int
+    order_kind: str = "bar"
     card: str = ""
     bank_name: str = ""
     status: str = "created"
@@ -129,6 +131,7 @@ def category_keyboard() -> InlineKeyboardMarkup:
             [InlineKeyboardButton("Вода🧊", callback_data="category:drinks")],
             [InlineKeyboardButton("Коктейль🍸", callback_data="category:cocktail")],
             [InlineKeyboardButton("Шоты🥛", callback_data="category:shots")],
+            [InlineKeyboardButton("Кальян💨", callback_data="category:kalyan")],
         ]
     )
 
@@ -269,6 +272,7 @@ def top_inline_keyboard() -> InlineKeyboardMarkup:
             [
                 InlineKeyboardButton("Меню бара🍹", callback_data="top:bar_menu"),
                 InlineKeyboardButton("Наш адрес📍", callback_data="top:address"),
+                InlineKeyboardButton("Купить билет🎫", callback_data="top:tiket"),
             ]
         ]
     )
@@ -354,6 +358,39 @@ async def handle_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE) -
             await query.message.reply_text("Файл меню не найден. Проверьте путь к menu.jpg.")
         return
 
+    if data == "top:tiket":
+        if update.effective_user is None:
+            return
+        next_data = next_order_assignment()
+        if next_data is None:
+            await query.message.reply_text(
+                "Невозможно оформить билет: лимит номеров (1-10000) достигнут или карты/админы не настроены."
+            )
+            return
+
+        order_number, admin_id, barmen_id = next_data
+        ticket_name = "Билет🎫 - 500р."
+        orders[order_number] = Order(
+            order_number=order_number,
+            customer_id=update.effective_user.id,
+            customer_name=get_customer_name(update),
+            items=[ticket_name],
+            total_amount=500,
+            admin_id=admin_id,
+            barmen_id=barmen_id,
+            order_kind="ticket",
+        )
+
+        await query.message.reply_text(
+            (
+                f"Покупка билета №{order_number:05d}\n"
+                "Стоимость: 500р.\n"
+                "Выберите банк для получения ссылки на оплату:"
+            ),
+            reply_markup=bank_selection_keyboard(order_number),
+        )
+        return
+
     if data == "category:cocktail":
         await query.edit_message_text("Выберите коктейль:", reply_markup=cocktails_keyboard())
         return
@@ -368,6 +405,13 @@ async def handle_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE) -
             "Вкусы: Малина, Гранат, Блю Кюрасао.\n"
             "Выбор вкуса шота будет на баре.",
             reply_markup=shots_keyboard(),
+        )
+        return
+
+    if data == "category:kalyan":
+        await query.edit_message_text(
+            "Кальян💨 — 1550р.\nДля оплаты подойдите к менеджеру.",
+            reply_markup=category_keyboard(),
         )
         return
 
@@ -526,6 +570,22 @@ async def handle_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE) -
 
         if update.effective_user is None or update.effective_user.id != order.customer_id:
             await query.message.reply_text("Подтвердить этот заказ может только покупатель.")
+            return
+
+        if order.order_kind == "ticket":
+            order.status = "ticket_paid"
+            await query.message.delete()
+            await query.message.reply_text("Оплата билета отмечена. Менеджер получил уведомление.")
+            await context.bot.send_message(
+                chat_id=order.admin_id,
+                text=(
+                    "Новая оплата билета:\n"
+                    f"Номер билета: {order.order_number:05d}\n"
+                    f"Покупатель: {order.customer_name}\n"
+                    f"Банк: {order.bank_name}\n"
+                    f"Сумма: {order.total_amount}р."
+                ),
+            )
             return
 
         order.status = "waiting_admin"
