@@ -59,6 +59,8 @@ ADDRESS_TEXT = (
     "г. Москва, Ольховская улица, 14с3"
 )
 
+KALIAN_TEXT = ( "Кальян💨 — 1550р.\nДля оплаты подойдите к менеджеру." )
+
 DRINKS = {
     "Water": "Святой источник 0,5 - 100р.",
 }
@@ -131,7 +133,6 @@ def category_keyboard() -> InlineKeyboardMarkup:
             [InlineKeyboardButton("Вода🧊", callback_data="category:drinks")],
             [InlineKeyboardButton("Коктейль🍸", callback_data="category:cocktail")],
             [InlineKeyboardButton("Шоты🥛", callback_data="category:shots")],
-            [InlineKeyboardButton("Кальян💨", callback_data="category:kalyan")],
         ]
     )
 
@@ -272,6 +273,7 @@ def top_inline_keyboard() -> InlineKeyboardMarkup:
             [InlineKeyboardButton("Меню бара🍹", callback_data="top:bar_menu")],
             [InlineKeyboardButton("Наш адрес📍", callback_data="top:address")],
             [InlineKeyboardButton("Купить билет🎫", callback_data="top:tiket")],
+            [InlineKeyboardButton("Кальян💨", callback_data="top:kalyan")],
         ]
     )
 
@@ -346,7 +348,11 @@ async def handle_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     if data == "top:address":
         await query.message.reply_text(ADDRESS_TEXT)
         return
-
+    
+    if data == "top:kalyan":
+        await query.massage.reply_text(KALIAN_TEXT)
+        return
+    
     if data == "top:bar_menu":
         menu_image_path = next((path for path in BAR_MENU_IMAGE_CANDIDATES if path.exists()), None)
         if menu_image_path is not None:
@@ -355,7 +361,7 @@ async def handle_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         else:
             await query.message.reply_text("Файл меню не найден. Проверьте путь к menu.jpg.")
         return
-
+    
     if data == "top:tiket":
         if update.effective_user is None:
             return
@@ -365,7 +371,7 @@ async def handle_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE) -
                 "Невозможно оформить билет: лимит номеров (1-10000) достигнут или карты/админы не настроены."
             )
             return
-
+        
         order_number, admin_id, barmen_id = next_data
         ticket_name = "Билет🎫 - 500р."
         orders[order_number] = Order(
@@ -403,13 +409,6 @@ async def handle_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE) -
             "Вкусы: Малина, Гранат, Блю Кюрасао.\n"
             "Выбор вкуса шота будет на баре.",
             reply_markup=shots_keyboard(),
-        )
-        return
-
-    if data == "category:kalyan":
-        await query.edit_message_text(
-            "Кальян💨 — 1550р.\nДля оплаты подойдите к менеджеру.",
-            reply_markup=category_keyboard(),
         )
         return
 
