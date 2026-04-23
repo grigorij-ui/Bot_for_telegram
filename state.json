@@ -1,4 +1,5 @@
 {
   "order_counter": 0,
-  "card_index": 1
+  "admin_index": 0, 
+  "barmen_index": 0
 }
