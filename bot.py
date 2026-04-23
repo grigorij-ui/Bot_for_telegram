@@ -24,7 +24,7 @@ BARMEN_IDS = [1720094364, 5798808763]
 
 CARDS: Dict[str, List[str]] = {
     "tbank": [
-        "https://tbank.ru/cf/223D77JNlDy",
+        "https://tbank.ru/cf/2oPLpVBL80Q",
         "https://tbank.ru/cf/6nMBJUr7uaZ",
     ],
     "sber": [
