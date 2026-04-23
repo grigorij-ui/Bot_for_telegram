@@ -350,7 +350,7 @@ async def handle_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         return
     
     if data == "top:kalyan":
-        await query.massage.reply_text(KALIAN_TEXT)
+        await query.message.reply_text(KALIAN_TEXT)
         return
     
     if data == "top:bar_menu":
