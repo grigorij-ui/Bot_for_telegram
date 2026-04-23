@@ -269,9 +269,9 @@ def cart_text(items: List[str]) -> str:
 def top_inline_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         [
-            [InlineKeyboardButton("Меню бара🍹", callback_data="top:bar_menu")]
-            [InlineKeyboardButton("Наш адрес📍", callback_data="top:address")]
-            [InlineKeyboardButton("Купить билет🎫", callback_data="top:tiket")]
+            [InlineKeyboardButton("Меню бара🍹", callback_data="top:bar_menu")],
+            [InlineKeyboardButton("Наш адрес📍", callback_data="top:address")],
+            [InlineKeyboardButton("Купить билет🎫", callback_data="top:tiket")],
         ]
     )
 
