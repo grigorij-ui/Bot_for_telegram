@@ -301,9 +301,13 @@ async def send_main_menu(chat_id: int, context: ContextTypes.DEFAULT_TYPE) -> No
             chat_id=chat_id,
             text="Добро пожаловать! Выберите нужный раздел:",
             reply_markup=top_inline_keyboard(),
-            reply_markup=main_menu_keyboard()
         )
 
+    await context.bot.send_message(
+        chat_id=chat_id,
+        text="Приятного вечера!",
+        reply_markup=main_menu_keyboard(),
+    )
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if update.effective_chat is None:
