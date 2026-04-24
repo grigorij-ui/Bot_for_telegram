@@ -18,7 +18,7 @@ from telegram.ext import (
 )
 
 # ====== CONFIG ======
-BOT_TOKEN = "8703264796:AAFmIbkXaZzWawngDZvjZeYGgSr7taA6bUM"
+BOT_TOKEN = "bot_token"
 ADMIN_IDS = [1849157614, 1912631413]
 BARMEN_IDS = [1720094364, 5798808763]
 
