@@ -301,13 +301,8 @@ async def send_main_menu(chat_id: int, context: ContextTypes.DEFAULT_TYPE) -> No
             chat_id=chat_id,
             text="Добро пожаловать! Выберите нужный раздел:",
             reply_markup=top_inline_keyboard(),
+            reply_markup=main_menu_keyboard()
         )
-
-    await context.bot.send_message(
-        chat_id=chat_id,
-        text="Выберите действие:",
-        reply_markup=main_menu_keyboard(),
-    )
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -411,10 +406,11 @@ async def handle_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE) -
             order_kind="ticket",
         )
 
-        await query.message.reply_text(
+        await query.edit_message_text(
             (
                 f"Покупка билета №{order_number:05d}\n"
                 f"Тип: {ticket_name}\n"
+                f"Итого к оплате: {ticket_price}р.\n"
                 "Выберите банк для получения ссылки на оплату:"
             ),
             reply_markup=bank_selection_keyboard(order_number),
@@ -557,6 +553,7 @@ async def handle_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         text = (
             f"Заказ №{order.order_number:05d}\n"
             f"Банк: {bank_name}\n"
+            f"Итого к оплате: {total_amount}р.\n"
             f"Ссылка на оплату:\n{escape(payment_url)}\n\n"
             f"Комментарий к переводу (скопируйте):\n<code>{escape(comment_text)}</code>\n\n"
             "Нажимайте кнопку 'Подтвердить оплату' только ПОСЛЕ перевода денежных средств, "
