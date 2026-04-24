@@ -554,6 +554,7 @@ async def handle_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         order.card = payment_url
         order.bank_name = bank_name
         comment_text = f"{order.customer_name} {order.order_number:05d}"
+        total_amount = sum(extract_item_price(item) for item in user_cart)
         text = (
             f"Заказ №{order.order_number:05d}\n"
             f"Банк: {bank_name}\n"
