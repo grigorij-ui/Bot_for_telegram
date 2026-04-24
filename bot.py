@@ -73,6 +73,11 @@ COCKTAILS = {
     "vodka_energy": "Водка с энергетиком - 350р.",
 }
 
+TIKET = {
+    'defolt' : 'Обычный билет🎫 - 500р.',
+    'sele_tiket' : 'Билет 1+1🎫🎫 - 850р.',
+}
+
 SHOTS = {
     "shots_12": "12 шотов за 1320р.",
     "shots_6": "6 шотов за 700р.",
@@ -154,6 +159,10 @@ def shots_keyboard() -> InlineKeyboardMarkup:
     buttons.append([InlineKeyboardButton("Назад", callback_data="back_to_categories")])
     return InlineKeyboardMarkup(buttons)
 
+def tiket_keyboard() -> InlineKeyboardMarkup:
+    buttons = [[InlineKeyboardButton(name, callback_data=f"tiket_type:{key}")] for key, name in TIKET.items()]
+    buttons.append([InlineKeyboardButton("Назад", callback_data="back_to_categories")])
+    return InlineKeyboardMarkup(buttons)
 
 def buyer_payment_keyboard(order_number: int) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
@@ -363,23 +372,40 @@ async def handle_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         return
     
     if data == "top:tiket":
+        await query.message.reply_text(
+            "Выберите тип билета:",
+            reply_markup=tiket_keyboard(),
+        )
+        return
+
+    if data.startswith("tiket_type:"):
+        tiket_key = data.split(":", 1)[1]
+
+        if tiket_key not in TIKET:
+            await query.message.reply_text("Неизвестный тип билета.")
+            return
+
         if update.effective_user is None:
             return
+
+        ticket_name = TIKET[tiket_key]
+        ticket_price = extract_item_price(ticket_name)
+
         next_data = next_order_assignment()
         if next_data is None:
             await query.message.reply_text(
                 "Невозможно оформить билет: лимит номеров (1-10000) достигнут или карты/админы не настроены."
             )
             return
-        
+
         order_number, admin_id, barmen_id = next_data
-        ticket_name = "Билет🎫 - 500р."
+
         orders[order_number] = Order(
             order_number=order_number,
             customer_id=update.effective_user.id,
             customer_name=get_customer_name(update),
             items=[ticket_name],
-            total_amount=500,
+            total_amount=ticket_price,
             admin_id=admin_id,
             barmen_id=barmen_id,
             order_kind="ticket",
@@ -388,7 +414,7 @@ async def handle_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         await query.message.reply_text(
             (
                 f"Покупка билета №{order_number:05d}\n"
-                "Стоимость: 500р.\n"
+                f"Тип: {ticket_name}\n"
                 "Выберите банк для получения ссылки на оплату:"
             ),
             reply_markup=bank_selection_keyboard(order_number),
